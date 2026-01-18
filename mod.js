@@ -2,9 +2,10 @@
     'use strict';
 
     const wait = setInterval(() => {
-        if(typeof Game !== 'undefined' && Game.ready && Game.wrinklers.length>0){
+        if(typeof Game !== 'undefined' && Game.ready && Game.wrinklers.length > 0){
             clearInterval(wait);
 
+            // 右下統計ボックス
             const box = document.createElement('div');
             box.style.position = 'fixed';
             box.style.right = '10px';
@@ -17,50 +18,28 @@
             box.style.zIndex = 9999;
             document.body.appendChild(box);
 
-            const hoverBox = document.createElement('div');
-            hoverBox.style.position = 'fixed';
-            hoverBox.style.pointerEvents = 'none';
-            hoverBox.style.background = 'rgba(0,0,0,0.7)';
-            hoverBox.style.color = '#fff';
-            hoverBox.style.padding = '4px 8px';
-            hoverBox.style.borderRadius = '4px';
-            hoverBox.style.fontSize = '12px';
-            hoverBox.style.display = 'none';
-            hoverBox.style.zIndex = 10000;
-            document.body.appendChild(hoverBox);
-
-            document.addEventListener('mousemove', e => {
-                hoverBox.style.left = e.pageX + 15 + 'px';
-                hoverBox.style.top = e.pageY + 15 + 'px';
-            });
-
+            // 毎フレーム更新
             Game.registerHook('logic', () => {
                 let active = 0;
                 let total = 0;
 
-                let hoverDetected = false;
-
                 Game.wrinklers.forEach(w => {
-                    let eaten = isFinite(w.stored) && w.stored>=0 ? w.stored : 0;
-                    total += eaten;
-                    if(w.phase===2) active++;
+                    if(!w) return;
 
-                    // マウス座標とWrinkler座標で簡易hover判定
-                    if(Game.mouseX && Game.mouseY && w.x && w.y){
-                        const dx = Game.mouseX - w.x;
-                        const dy = Game.mouseY - w.y;
-                        const dist = Math.sqrt(dx*dx + dy*dy);
-                        if(dist < 48){ // 近ければhover
-                            hoverBox.textContent = `食べた: ${Beautify(eaten)} クッキー`;
-                            hoverBox.style.display = 'block';
-                            hoverDetected = true;
-                        }
+                    // ブラウザ版で正しく取得できる値
+                    let eaten = (typeof w.amount === 'number' && w.amount > 0) ? w.amount : 0;
+                    total += eaten;
+
+                    if(w.phase === 2) active++; // 生きている Wrinkler
+
+                    // hoverで個別表示
+                    if(w.div) {
+                        w.div.title = `食べた: ${Beautify(eaten)} クッキー`;
                     }
                 });
 
-                if(!hoverDetected) hoverBox.style.display = 'none';
                 box.textContent = `シワシワ虫: ${active}匹 / 合計: ${Beautify(total)}`;
             });
         }
-    }, 500);
+    }, 1000);
 })();
