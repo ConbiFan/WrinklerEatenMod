@@ -1,0 +1,2 @@
+# WrinklerEatenMod
+Cookie ClickerでWrinklerが食べたクッキーの数を表示できます。
