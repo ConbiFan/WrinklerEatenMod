@@ -2,10 +2,9 @@
     'use strict';
 
     const wait = setInterval(() => {
-        if(typeof Game !== 'undefined' && Game.ready){
+        if(typeof Game !== 'undefined' && Game.ready && Game.wrinklers.length > 0){
             clearInterval(wait);
 
-            // 右下ボックス作成
             const box = document.createElement('div');
             box.style.position = 'fixed';
             box.style.right = '10px';
@@ -21,14 +20,14 @@
             box.id = 'wrinklerCounter';
             document.body.appendChild(box);
 
-            // 更新処理
             Game.registerHook('logic', () => {
                 let total = 0;
                 let active = 0;
                 let lines = [];
 
                 Game.wrinklers.forEach((w,i) => {
-                    let eaten = isFinite(w.eaten) && w.eaten>0 ? w.eaten : 0;
+                    // ここで undefined / Infinity / null を全部0に置換
+                    let eaten = (typeof w.eaten === 'number' && isFinite(w.eaten) && w.eaten>=0) ? w.eaten : 0;
                     if(w.phase === 2) active++;
                     total += eaten;
                     lines.push(`ID:${i} ${w.phase===2?'生きてる':'死んでる'} / 食べた: ${Beautify(eaten)}`);
