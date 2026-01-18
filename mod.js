@@ -2,10 +2,10 @@
     'use strict';
 
     const wait = setInterval(() => {
-        if (typeof Game !== 'undefined' && Game.ready) {
+        if(typeof Game !== 'undefined' && Game.ready){
             clearInterval(wait);
 
-            // 右下統計ボックス
+            // 右下ボックス作成
             const box = document.createElement('div');
             box.style.position = 'fixed';
             box.style.right = '10px';
@@ -16,39 +16,26 @@
             box.style.fontSize = '14px';
             box.style.borderRadius = '6px';
             box.style.zIndex = 9999;
+            box.style.maxHeight = '50vh';
+            box.style.overflowY = 'auto';
             box.id = 'wrinklerCounter';
             document.body.appendChild(box);
 
-            // 更新
+            // 更新処理
             Game.registerHook('logic', () => {
                 let total = 0;
                 let active = 0;
+                let lines = [];
 
-                Game.wrinklers.forEach(w => {
-                    if(w.phase === 2){ // 生きてる
-                        let eaten = w.eaten;
-                        // 無限大やNaNは0に置き換え
-                        if(!isFinite(eaten) || eaten < 0) eaten = 0;
-                        total += eaten;
-                        active++;
-                    }
+                Game.wrinklers.forEach((w,i) => {
+                    let eaten = isFinite(w.eaten) && w.eaten>0 ? w.eaten : 0;
+                    if(w.phase === 2) active++;
+                    total += eaten;
+                    lines.push(`ID:${i} ${w.phase===2?'生きてる':'死んでる'} / 食べた: ${Beautify(eaten)}`);
                 });
 
-                box.textContent = `シワシワ虫: ${active}匹 / 食べた量: ${Beautify(total)}`;
-            });
-
-            // 個別確認用コンソールログ
-            document.addEventListener('keydown', e => {
-                if(e.key === 'w'){ // wキー押すとログ
-                    console.log('=== Wrinkler Info ===');
-                    Game.wrinklers.forEach((w,i)=>{
-                        console.log(
-                            `ID:${i} ${w.phase===2?'生きてる':'死んでる'} / 食べた: ${Beautify(isFinite(w.eaten)?w.eaten:0)}`
-                        );
-                    });
-                }
+                box.innerHTML = `シワシワ虫: ${active}匹 / 合計: ${Beautify(total)}<br>` + lines.join('<br>');
             });
         }
     }, 500);
 })();
-
