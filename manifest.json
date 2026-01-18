@@ -1,0 +1,9 @@
+{
+  "mod_name": "Wrinkler Eaten Counter",
+  "mod_description": "Shows how many cookies wrinklers have eaten",
+  "mod_version": "1.0",
+  "author": "Conbi Fan",
+  "support_url": "",
+  "game_version": "2.058", 
+  "tags": ["UI", "Wrinkler", "QoL"]
+}
