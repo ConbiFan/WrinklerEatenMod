@@ -2,7 +2,7 @@
     'use strict';
 
     const wait = setInterval(() => {
-        if(typeof Game !== 'undefined' && Game.ready && Game.wrinklers.length>0){
+        if(typeof Game !== 'undefined' && Game.ready && Game.wrinklers.length > 0){
             clearInterval(wait);
 
             // 右下ボックス
@@ -19,24 +19,24 @@
             box.id = 'wrinklerCounter';
             document.body.appendChild(box);
 
+            // 毎フレーム更新
             Game.registerHook('logic', () => {
                 let active = 0;
                 let total = 0;
 
                 Game.wrinklers.forEach(w => {
-                    if(w.phase===2) active++;
+                    if(w.phase === 2) active++;
 
-                    // Wrinkler が食べたクッキー量
+                    // 正しい吸収量を取得
                     let eaten = 0;
-                    if(typeof w.eaten==='number') eaten = w.eaten;
-                    else if(typeof w.total==='number') eaten = w.total;
-                    else if(typeof w.sucked==='number') eaten = w.sucked;
+                    if(typeof w.total === 'number') eaten = w.total;
+                    else if(typeof w.amount === 'number') eaten = w.amount;
 
-                    if(!isFinite(eaten) || eaten<0) eaten = 0;
+                    if(!isFinite(eaten) || eaten < 0) eaten = 0;
                     total += eaten;
 
-                    // 個別Wrinklerにマウスを乗せたら食べた量を表示
-                    if(w.div){
+                    // マウス乗せたときだけ表示
+                    if(w.div) {
                         w.div.title = `食べた: ${Beautify(eaten)} クッキー`;
                     }
                 });
