@@ -5,6 +5,7 @@
         if (typeof Game !== 'undefined' && Game.ready) {
             clearInterval(wait);
 
+            // 右下に統計表示用ボックス
             const box = document.createElement('div');
             box.style.position = 'fixed';
             box.style.right = '10px';
@@ -18,21 +19,27 @@
             box.id = 'wrinklerCounter';
             document.body.appendChild(box);
 
+            // 毎フレーム更新
             Game.registerHook('logic', () => {
                 let total = 0;
                 let active = 0;
 
                 Game.wrinklers.forEach(w => {
                     if (w.phase === 2) { // 生きてるシワシワ虫
-                        total += w.eaten;
+                        const eaten = isFinite(w.eaten) ? w.eaten : 0;
+                        total += eaten;
                         active++;
+
+                        // マウスオーバーで個別表示
+                        const el = w.div; // w.div がシワシワ虫の DOM
+                        if(el){
+                            el.title = `食べた量: ${Beautify(eaten)} クッキー`;
+                        }
                     }
                 });
 
-                box.textContent =
-                    `シワシワ虫: ${active}匹 / 食べた量: ${Beautify(total)}`;
+                box.textContent = `シワシワ虫: ${active}匹 / 食べた量: ${Beautify(total)}`;
             });
         }
     }, 500);
-
 })();
