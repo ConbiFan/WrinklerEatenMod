@@ -2,9 +2,10 @@
     'use strict';
 
     const wait = setInterval(() => {
-        if(typeof Game !== 'undefined' && Game.ready && Game.wrinklers.length > 0){
+        if(typeof Game !== 'undefined' && Game.ready && Game.wrinklers.length>0){
             clearInterval(wait);
 
+            // 右下ボックス
             const box = document.createElement('div');
             box.style.position = 'fixed';
             box.style.right = '10px';
@@ -15,25 +16,32 @@
             box.style.fontSize = '14px';
             box.style.borderRadius = '6px';
             box.style.zIndex = 9999;
-            box.style.maxHeight = '50vh';
-            box.style.overflowY = 'auto';
             box.id = 'wrinklerCounter';
             document.body.appendChild(box);
 
             Game.registerHook('logic', () => {
-                let total = 0;
                 let active = 0;
-                let lines = [];
+                let total = 0;
 
-                Game.wrinklers.forEach((w,i) => {
-                    // ここで undefined / Infinity / null を全部0に置換
-                    let eaten = (typeof w.eaten === 'number' && isFinite(w.eaten) && w.eaten>=0) ? w.eaten : 0;
-                    if(w.phase === 2) active++;
+                Game.wrinklers.forEach(w => {
+                    if(w.phase===2) active++;
+
+                    // Wrinkler が食べたクッキー量
+                    let eaten = 0;
+                    if(typeof w.eaten==='number') eaten = w.eaten;
+                    else if(typeof w.total==='number') eaten = w.total;
+                    else if(typeof w.sucked==='number') eaten = w.sucked;
+
+                    if(!isFinite(eaten) || eaten<0) eaten = 0;
                     total += eaten;
-                    lines.push(`ID:${i} ${w.phase===2?'生きてる':'死んでる'} / 食べた: ${Beautify(eaten)}`);
+
+                    // 個別Wrinklerにマウスを乗せたら食べた量を表示
+                    if(w.div){
+                        w.div.title = `食べた: ${Beautify(eaten)} クッキー`;
+                    }
                 });
 
-                box.innerHTML = `シワシワ虫: ${active}匹 / 合計: ${Beautify(total)}<br>` + lines.join('<br>');
+                box.textContent = `シワシワ虫: ${active}匹 / 合計: ${Beautify(total)}`;
             });
         }
     }, 500);
